@@ -1,0 +1,83 @@
+CTF BASE FF77_0000
+
+UART0_RXD/GPIO4_C0_uAH11
+UART0_TXD/GPIO4_C1_dAG10
+UART0_CTSn/GPIO4_C2_uAB12
+UART0_RTSn/GPIO4_C3_uAB11
+
+SDIO0_D0/GPIO4_C4_uAH9
+SDIO0_D1/GPIO4_C5_uAH10
+SDIO0_D2/GPIO4_C6_uAG9
+SDIO0_D3/GPIO4_C7_uAH7
+SDIO0_CMD/GPIO4_D0_u
+SDIO0_CLKOUT/GPIO4_D1_d
+
+
+IOMUX
+GRF_GPIO4C_IOMUX 0x0044
+GRF_GPIO4D_IOMUX 0x0048
+
+io -4 -r 0xFF770044
+io -4 -r 0xFF770048
+
+rk3288:/ # io -4 -r 0xFF770044  //bit[14]-bit[8] 5500
+ff770044:  00005555
+rk3288:/ # io -4 -r 0xFF770048  //bit[2] ~bit[0] 5
+ff770048:  00001005
+
+pull_up/pull_down
+GRF_GPIO4C_P 0x0178
+GRF_GPIO4D_P 0x017c
+2'b00: Z(Noraml operaton);
+2'b01: weak 1(pull-up);
+2'b10: weak 0(pull-down);
+2'b11: Repeater(Bus keeper)
+
+io -4 -r 0xFF770178
+io -4 -r 0xFF77017c
+
+127|rk3288:/ # io -4 -r 0xFF770178
+ff770178:  00005511
+127|rk3288:/ # io -4 -r 0xFF77017c
+ff77017c:  00005a91
+
+去掉内部上下拉验证看
+io -4 -w 0xFF770178 0xffffaa11
+io -4 -r 0xFF770178
+io -4 -w 0xFF77017c 0xffff5a9a
+io -4 -r 0xFF77017c
+
+
+drive strength
+GRF_GPIO4C_E 0x01f8
+GRF_GPIO4D_E 0x01fc
+2'b00: 2mA
+2'b01: 4mA
+2'b10: 8mA
+2'b11: 12mA
+io -4 -r 0xFF7701f8
+io -4 -r 0xFF7701fc
+
+2|rk3288:/ # io -4 -r 0xFF7701f8
+ff7701f8:  00005555
+
+127|rk3288:/ # io -4 -r 0xFF7701fc
+ff7701fc:  00005555
+
+//电流驱动强度调到12mA验证看
+io -4 -w 0xFF7701f8 0xffffff55
+io -4 -r 0xFF7701f8
+io -4 -w 0xFF7701fc 0xffff555f
+io -4 -r 0xFF7701fc
+
+
+voltage selection APIO3_VDD bit4 1 1.8V
+GRF_IO_VSEL 0x0380
+io -4 -r 0xFF770380
+
+rk3288:/ # io -4 -r 0xFF770380 
+ff770380:  00000016
+
+
+
+
